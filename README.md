@@ -18,7 +18,7 @@ Create a nested pie chart.
 
 ## Output Arguments:
 *(Optional)*
-- **h**                - Figure handle of spider plot.
+- **h**                - Figure handle of pie chart.
                          [figure object]
 
 ## Name-Value Pair Arguments:
