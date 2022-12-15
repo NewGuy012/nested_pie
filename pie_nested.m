@@ -4,7 +4,7 @@ function varargout = pie_nested(C, varargin)
 % Syntax:
 %   pie_nested(C)
 %   pie_nested(C, Name, Value, ...)
-%   h = pie_nested(_);
+%   h = pie_nested(_)
 %
 % Documentation:
 %   Please refer to the MathWorks File Exchange or GitHub page for the
@@ -39,11 +39,12 @@ ax.YColor = 'none';
 
 % Pie properties
 num_pie = length(C);
-num_outmost = length(C(end));
+num_outmost = length(C{end});
 pie_labels = cell(num_outmost, 1);
 
 % Number of wedges
 num_wedges = cellfun(@(C) length(C), C, 'UniformOutput', false);
+num_wedges = cell2mat(num_wedges);
 max_wedges = max(num_wedges);
 
 % Default labels
@@ -51,18 +52,24 @@ for ii = 1:num_outmost
     pie_labels{ii} = sprintf('Label %i', ii);
 end
 
+% Pre-allocation
+wedge_colors = cell(num_pie, 1);
+
 % Default arguments
 rho_lower = 0.2;
 edge_color = 'k';
 line_width = 2;
 line_style = '-';
-wedge_colors = lines(max_wedges);
+wedge_colors(:) = {lines(max_wedges)};
 percent_status = 'on';
 percent_precision = 2;
 label_fontsize = 10;
 fill_transparency = 1;
 label_interpreter = 'none';
 interval_res = 0.01;
+
+% Number of optional arguments
+numvarargs = length(varargin);
 
 % Check if optional arguments were specified
 if numvarargs > 1
@@ -110,7 +117,7 @@ rho = rho_lower:rho_interval:rho_upper;
 % Iterate through number of nested pies
 for ii = 1:num_pie
     % Initialize
-    sub_pie = cell2mat(C{ii}); % Convert from cell to numerical array
+    sub_pie = C{ii}; % Convert from cell to numerical array
     num_wedge = num_wedges(ii);
     wedge_color = wedge_colors{ii};
 
