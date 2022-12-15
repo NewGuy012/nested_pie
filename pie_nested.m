@@ -63,8 +63,18 @@ line_style = '-';
 wedge_colors(:) = {lines(max_wedges)};
 percent_status = 'on';
 percent_precision = 2;
-label_fontsize = 10;
+percent_fontcolor = 'w';
+percent_fontsize = 10;
+percent_fontweight = 'bold';
+percent_edgecolor = 'none';
+percent_backgroundcolor = 'none';
 fill_transparency = 1;
+label_fontsize = 10;
+label_fontcolor = 'k';
+label_fontweight = 'bold';
+label_edgecolor = 'none';
+label_backgroundcolor = 'none';
+label_rotation = 0;
 label_interpreter = 'none';
 interval_res = 0.01;
 
@@ -93,14 +103,34 @@ if numvarargs > 1
                 wedge_colors = value_arguments{ii};
             case 'percentstatus'
                 percent_status = value_arguments{ii};
-            case 'percent_precision'
+            case 'percentprecision'
                 percent_precision = value_arguments{ii};
+            case 'percentfontcolor'
+                percent_fontcolor = value_arguments{ii};
+            case 'percentfontsize'
+                percent_fontsize = value_arguments{ii};
+            case 'percentfontweight'
+                percent_fontweight = value_arguments{ii};
+            case 'percentedgecolor'
+                percent_edgecolor = value_arguments{ii};
+            case 'percentbackgroundcolor'
+                percent_backgroundcolor = value_arguments{ii};
             case 'labelfontsize'
                 label_fontsize = value_arguments{ii};
-            case 'filltransparency'
-                fill_transparency = value_arguments{ii};
+            case 'labelfontcolor'
+                label_fontcolor = value_arguments{ii};
+            case 'labelfontweight'
+                label_fontweight = value_arguments{ii};
+            case 'labeledgecolor'
+                label_edgecolor = value_arguments{ii};
+            case 'labelbackgroundcolor'
+                label_backgroundcolor = value_arguments{ii};
+            case 'labelrotation'
+                label_rotation = value_arguments{ii};
             case 'labelinterpreter'
                 label_interpreter = value_arguments{ii};
+            case 'filltransparency'
+                fill_transparency = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
@@ -215,8 +245,11 @@ for ii = 1:num_pie
 
                     % Display percentage text
                     text(x_txt, y_txt, percent_txt,...
-                        'Color', 'w',...
-                        'FontWeight', 'bold',...
+                        'Color', percent_fontcolor,...
+                        'FontWeight', percent_fontweight,...
+                        'FontSize', percent_fontsize,...
+                        'EdgeColor', percent_edgecolor,...
+                        'BackgroundColor', percent_backgroundcolor,...
                         'HorizontalAlignment', 'center');
                 end
 
@@ -227,9 +260,12 @@ for ii = 1:num_pie
 
                     % Display pie labels
                     text(x_label, y_label, pie_labels{kk},...
-                        'Color', 'k',...
-                        'FontWeight', 'bold',...
+                        'Color', label_fontcolor,...
+                        'FontWeight', label_fontweight,...
                         'FontSize', label_fontsize,...
+                        'EdgeColor', label_edgecolor,...
+                        'BackgroundColor', label_backgroundcolor,...
+                        'Rotation', label_rotation,...
                         'HorizontalAlignment', 'center',...
                         'Interpreter', label_interpreter);
                 end
