@@ -54,6 +54,7 @@ end
 
 % Pre-allocation
 wedge_colors = cell(num_pie, 1);
+percent_status = cell(num_pie, 1);
 
 % Default arguments
 rho_lower = 0.2;
@@ -61,8 +62,8 @@ edge_color = 'k';
 line_width = 2;
 line_style = '-';
 wedge_colors(:) = {lines(max_wedges)};
-percent_status = 'on';
-percent_precision = 2;
+percent_status(:) = {'on'};
+percent_precision = 1;
 percent_fontcolor = 'w';
 percent_fontsize = 10;
 percent_fontweight = 'bold';
@@ -75,6 +76,7 @@ label_fontweight = 'bold';
 label_edgecolor = 'none';
 label_backgroundcolor = 'none';
 label_rotation = 0;
+label_offset = 0;
 label_interpreter = 'none';
 interval_res = 0.01;
 
@@ -155,7 +157,7 @@ for ii = 1:num_pie
     if sum(sub_pie) ~= 1
         % Display warning
         warning('Data does not sum to 1. Attempting to normalize data...');
-        
+
         % Normalize data to add up to one
         sub_pie = sub_pie / sum(sub_pie);
     end
@@ -163,7 +165,7 @@ for ii = 1:num_pie
     % Initialize theta
     theta = 2 * pi * sub_pie;
     theta = cumsum(theta);
-    theta = [0, theta]; %#ok<*AGROW> 
+    theta = [0, theta]; %#ok<*AGROW>
 
     % Iterate through number of wedges
     for jj = 1:num_wedge
@@ -181,7 +183,7 @@ for ii = 1:num_pie
         % Initialize
         x_patch = [];
         y_patch = [];
-        
+
         % Iterate through a four-sided polygon
         for kk = 1:4
             % Initialize
@@ -212,69 +214,117 @@ for ii = 1:num_pie
             'FaceAlpha', fill_transparency);
     end
 
-    % For all wedges not in the innermost layer
-    if ii ~= 1
-        % Find midpoint of theta and rho
-        theta_diff = diff(theta)/2;
-        theta_diff = theta(1:end-1) + theta_diff;
+    % Find midpoint of theta and rho
+    theta_diff = diff(theta)/2;
+    theta_diff = theta(1:end-1) + theta_diff;
 
-        rho_delta = diff(rho)/2;
-        rho_diff = rho(1:end-1) + rho_delta;
-        rho_diff = rho_diff(2:end);
-        rho_labels = rho(end) + rho_delta;
+    rho_wedge = rho(ii:ii+1);
+    rho_delta = diff(rho_wedge)/2;
+    rho_diff = rho_wedge(1:end-1) + rho_delta;
+    rho_labels = rho_wedge(end) + rho_delta;
 
-        % Iterate through rho midpoints
-        for jj = 1:length(rho_diff)
+    % Iterate through rho midpoints
+    for jj = 1:length(rho_diff)
+        % Initialize
+        rho_txt = rho_diff(jj);
+        rho_label = rho_labels(jj);
+
+        % Iterate through theta midpoints
+        for kk = 1:length(theta_diff)
             % Initialize
-            rho_txt = rho_diff(jj);
-            rho_label = rho_labels(jj);
+            theta_txt = theta_diff(kk);
 
-            % Iterate through theta midpoints
-            for kk = 1:length(theta_diff)
-                % Check if display percent status
-                if strcmp(percent_status, 'on')
-                    % Initialize
-                    theta_txt = theta_diff(kk);
+            % Check if display percent status
+            if strcmp(percent_status{ii}, 'on')
+                % Format percentage text
+                precision_txt = sprintf('%i', percent_precision);
+                percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_pie(kk)*100);
 
-                    % Format percentage text
-                    precision_txt = sprintf('%i', percent_precision);
-                    percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_pie(kk)*100);
+                % Convert from polar to cartesian
+                [x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
 
-                    % Convert from polar to cartesian
-                    [x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
+                % Display percentage text
+                text(x_txt, y_txt, percent_txt,...
+                    'Color', percent_fontcolor,...
+                    'FontWeight', percent_fontweight,...
+                    'FontSize', percent_fontsize,...
+                    'EdgeColor', percent_edgecolor,...
+                    'BackgroundColor', percent_backgroundcolor,...
+                    'HorizontalAlignment', 'center');
+            end
 
-                    % Display percentage text
-                    text(x_txt, y_txt, percent_txt,...
-                        'Color', percent_fontcolor,...
-                        'FontWeight', percent_fontweight,...
-                        'FontSize', percent_fontsize,...
-                        'EdgeColor', percent_edgecolor,...
-                        'BackgroundColor', percent_backgroundcolor,...
-                        'HorizontalAlignment', 'center');
-                end
+            % Only for outermost
+            if ii == num_pie
+                % Convert from polar to cartesian
+                [x_label, y_label] = pol2cart(theta_txt, rho_label+label_offset);
 
-                % Only for outermost
-                if ii == num_pie
-                    % Convert from polar to cartesian
-                    [x_label, y_label] = pol2cart(theta_txt, rho_label);
+                [horz_align, vert_align] = quadrant_position(theta_txt);
 
-                    % Display pie labels
-                    text(x_label, y_label, pie_labels{kk},...
-                        'Color', label_fontcolor,...
-                        'FontWeight', label_fontweight,...
-                        'FontSize', label_fontsize,...
-                        'EdgeColor', label_edgecolor,...
-                        'BackgroundColor', label_backgroundcolor,...
-                        'Rotation', label_rotation,...
-                        'HorizontalAlignment', 'center',...
-                        'Interpreter', label_interpreter);
-                end
-
+                % Display pie labels
+                text(x_label, y_label, pie_labels{kk},...
+                    'Color', label_fontcolor,...
+                    'FontWeight', label_fontweight,...
+                    'FontSize', label_fontsize,...
+                    'EdgeColor', label_edgecolor,...
+                    'BackgroundColor', label_backgroundcolor,...
+                    'Rotation', label_rotation,...
+                    'HorizontalAlignment', horz_align,...
+                    'VerticalAlignment', vert_align,...
+                    'Interpreter', label_interpreter);
             end
         end
-
-
     end
 end
+
+    function [horz_align, vert_align] = quadrant_position(theta_point)
+        % Find out which quadrant the point is in
+        if theta_point == 0
+            quadrant = 0;
+        elseif theta_point == pi/2
+            quadrant = 1.5;
+        elseif theta_point == pi
+            quadrant = 2.5;
+        elseif theta_point == 3*pi/2
+            quadrant = 3.5;
+        elseif theta_point == 2*pi
+            quadrant = 0;
+        elseif theta_point > 0 && theta_point < pi/2
+            quadrant = 1;
+        elseif theta_point > pi/2 && theta_point < pi
+            quadrant = 2;
+        elseif theta_point > pi && theta_point < 3*pi/2
+            quadrant = 3;
+        elseif theta_point > 3*pi/2 && theta_point < 2*pi
+            quadrant = 4;
+        end
+
+        % Adjust label alignment depending on quadrant
+        switch quadrant
+            case 0
+                horz_align = 'left';
+                vert_align = 'middle';
+            case 1
+                horz_align = 'left';
+                vert_align = 'bottom';
+            case 1.5
+                horz_align = 'center';
+                vert_align = 'bottom';
+            case 2
+                horz_align = 'right';
+                vert_align = 'bottom';
+            case 2.5
+                horz_align = 'right';
+                vert_align = 'middle';
+            case 3
+                horz_align = 'right';
+                vert_align = 'top';
+            case 3.5
+                horz_align = 'center';
+                vert_align = 'top';
+            case 4
+                horz_align = 'left';
+                vert_align = 'top';
+        end
+    end
 
 end
