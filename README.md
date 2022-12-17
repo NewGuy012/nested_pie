@@ -1,7 +1,7 @@
 [![View pie_nested on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-pie_nested)
 
 # pie_nested
-Create a nested pie chart.
+Create a nested pie chart with customizable text.
 
 ## Syntax:
 **pie_nested(C)**
@@ -13,8 +13,8 @@ Create a nested pie chart.
 ## Input Arguments:
 *(Required)*
 
-- **C** - The data points used to plot the nested pie chart. It is a nested cell array of numerical values, starting with the inner most going to the outer most part of the pie chart.
-          [nested cell]
+- **C** - The data points used to plot the nested pie chart. It is a nested cell array of numerical values, starting with the inner most layer going to the outer most layer of the pie chart.
+          [nested cell of numerical array]
 
 ## Output Arguments:
 *(Optional)*
@@ -60,6 +60,9 @@ Create a nested pie chart.
 - **PercentBackgroundColor**- Used to specify the percentage text box background color.
                         [white (default) | RGB triplet | hexadecimal color code]
 
+- **LabelText**       - Used to specify the label of the outer most layer.
+                        [default text | cell array of char]
+
 - **LabelFontSize**   - Used to specify the font size of the labels.
                         [10 (default) | scalar value]
 
@@ -94,7 +97,7 @@ Create a nested pie chart.
 inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
 outer_pie = [0.25, 0.25, 0.5];
 C = {...
-    inner_pie,... % Inner pie must come first!
+    inner_pie,... % Inner to outer layer
     outer_pie};
 
 % Spider plot
@@ -123,7 +126,7 @@ lg.Title.String = 'Inner Pie';
 inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
 outer_pie = [0.25, 0.25, 0.5];
 C = {...
-    inner_pie,... % Inner pie must come first!
+    inner_pie,... % Inner to outer layer
     outer_pie};
 
 % Custom colors
@@ -177,7 +180,7 @@ inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
 middle_pie = [0.2, 0.05, 0.1, 0.1, 0.05, 0.1, 0.2, 0.2];
 outer_pie = [0.25, 0.25, 0.5];
 C = {...
-    inner_pie,... % Inner pie must come first!
+    inner_pie,... % Inner to outer layer
     middle_pie,...
     outer_pie};
 

@@ -40,7 +40,7 @@ ax.YColor = 'none';
 % Pie properties
 num_pie = length(C);
 num_outmost = length(C{end});
-pie_labels = cell(num_outmost, 1);
+label_text = cell(num_outmost, 1);
 
 % Number of wedges
 num_wedges = cellfun(@(C) length(C), C, 'UniformOutput', false);
@@ -49,7 +49,7 @@ max_wedges = max(num_wedges);
 
 % Default labels
 for ii = 1:num_outmost
-    pie_labels{ii} = sprintf('Label %i', ii);
+    label_text{ii} = sprintf('Label %i', ii);
 end
 
 % Pre-allocation
@@ -117,6 +117,8 @@ if numvarargs > 1
                 percent_edgecolor = value_arguments{ii};
             case 'percentbackgroundcolor'
                 percent_backgroundcolor = value_arguments{ii};
+            case 'labeltext'
+                label_text = value_arguments{ii};
             case 'labelfontsize'
                 label_fontsize = value_arguments{ii};
             case 'labelfontcolor'
@@ -138,6 +140,15 @@ if numvarargs > 1
         end
     end
 
+end
+
+% Error checking
+if rho_lower < 0 || rho_lower > 1
+    error('Error: The starting radius must be a value between [0, 1].');
+end
+
+if length(label_text) ~= num_outmost
+    error('Error: The label text must equal the length of the wedges in the outer most layer.');
 end
 
 % Initialize rho
@@ -261,7 +272,7 @@ for ii = 1:num_pie
                 [horz_align, vert_align] = quadrant_position(theta_txt);
 
                 % Display pie labels
-                text(x_label, y_label, pie_labels{kk},...
+                text(x_label, y_label, label_text{kk},...
                     'Color', label_fontcolor,...
                     'FontWeight', label_fontweight,...
                     'FontSize', label_fontsize,...
