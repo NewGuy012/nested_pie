@@ -156,6 +156,7 @@ rho_upper = 1;
 rho_range = rho_upper - rho_lower;
 rho_interval = rho_range/num_pie;
 rho = rho_lower:rho_interval:rho_upper;
+tol = eps(1);
 
 % Iterate through number of nested pies
 for ii = 1:num_pie
@@ -163,9 +164,15 @@ for ii = 1:num_pie
     sub_pie = C{ii}; % Convert from cell to numerical array
     num_wedge = num_wedges(ii);
     wedge_color = wedge_colors{ii};
-
+    bEssentiallyEqual = false;
+    
+    % Compare taking into account floating-point number
+    if abs(1 - sum(sub_pie)) <= tol
+        bEssentiallyEqual = true;
+    end
+    
     % Check if data does not sum to one
-    if sum(sub_pie) ~= 1
+    if ~bEssentiallyEqual
         % Display warning
         warning('Data does not sum to 1. Attempting to normalize data...');
 
