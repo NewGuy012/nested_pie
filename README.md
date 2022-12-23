@@ -156,7 +156,7 @@ title('Nested Pie Chart');
   <img src="screenshot/example2.PNG">
 </p>
 
-### Example 3: Thin pie chart
+### Example 3: Thin pie crust
 ```matlab
 % Initialize data points
 inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
