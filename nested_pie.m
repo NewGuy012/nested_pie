@@ -1,10 +1,10 @@
-function varargout = pie_nested(C, varargin)
-%pie_nested Create a nested pie chart.
+function varargout = nested_pie(C, varargin)
+%nested_pie Create a nested pie chart.
 %
 % Syntax:
-%   pie_nested(C)
-%   pie_nested(C, Name, Value, ...)
-%   h = pie_nested(_)
+%   nested_pie(C)
+%   nested_pie(C, Name, Value, ...)
+%   h = nested_pie(_)
 %
 % Documentation:
 %   Please refer to the MathWorks File Exchange or GitHub page for the

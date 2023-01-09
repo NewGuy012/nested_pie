@@ -1,14 +1,14 @@
-[![View pie_nested on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-pie_nested)
+[![View nested_pie on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-nested_pie)
 
-# pie_nested
+# nested_pie
 Create a nested pie chart with customizable text.
 
 ## Syntax:
-**pie_nested(C)**
+**nested_pie(C)**
 
-**pie_nested(C, Name, Value, ...)**
+**nested_pie(C, Name, Value, ...)**
 
-**h = pie_nested(_)**
+**h = nested_pie(_)**
 
 ## Input Arguments:
 *(Required)*
@@ -101,7 +101,7 @@ C = {...
     outer_pie};
 
 % Spider plot
-pie_nested(C,...
+nested_pie(C,...
     'PercentStatus', {'off', 'on'});
 
 % Title
@@ -146,7 +146,7 @@ wedge_colors = {...
     outer_colors};
 
 % Spider plot
-pie_nested(C,...
+nested_pie(C,...
     'WedgeColors', wedge_colors);
 
 % Title
@@ -163,7 +163,7 @@ inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
 C = {inner_pie};
 
 % Spider plot
-pie_nested(C,...
+nested_pie(C,...
     'RhoLower', 0.7);
 
 % Title
@@ -185,7 +185,7 @@ C = {...
     outer_pie};
 
 % Spider plot
-pie_nested(C,...
+nested_pie(C,...
     'PercentStatus', {'off', 'off', 'off'});
 
 % Title
@@ -201,4 +201,4 @@ Moses Yoo, (juyoung.m.yoo at gmail dot com)
 ## Special Thanks:
 Special thanks to the following people for their feature recommendations and bug finds.
 
-[![View pie_nested on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-pie_nested)
+[![View nested_pie on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-nested_pie)
