@@ -156,7 +156,7 @@ rho_upper = 1;
 rho_range = rho_upper - rho_lower;
 rho_interval = rho_range/num_pie;
 rho = rho_lower:rho_interval:rho_upper;
-tol = eps(1);
+tol = eps(2);
 
 % Iterate through number of nested pies
 for ii = 1:num_pie
