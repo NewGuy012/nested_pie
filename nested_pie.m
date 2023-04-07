@@ -10,33 +10,6 @@ function varargout = nested_pie(C, varargin)
 %   Please refer to the MathWorks File Exchange or GitHub page for the
 %   detailed documentation and examples.
 
-% Figure properties
-fig = figure;
-background_color = 'w';
-fig.Color = background_color;
-
-% Check for output arguments
-if nargout > 1
-    error('Error: Too many output arguments assigned.');
-end
-varargout{1} = fig;
-
-% Axes properties
-ax = gca;
-ax.Color = background_color;
-
-% Axis properties
-hold(ax, 'on');
-axis(ax, 'square');
-scaling_factor = 1.2;
-axis(ax, [-1, 1, -1, 1] * scaling_factor);
-
-% Axis properties
-ax.XTickLabel = [];
-ax.YTickLabel = [];
-ax.XColor = 'none';
-ax.YColor = 'none';
-
 % Pie properties
 num_pie = length(C);
 num_outmost = length(C{end});
@@ -79,6 +52,7 @@ label_rotation = 0;
 label_offset = 0;
 label_interpreter = 'none';
 interval_res = 0.01;
+axes_handle = [];
 
 % Number of optional arguments
 numvarargs = length(varargin);
@@ -135,12 +109,50 @@ if numvarargs > 1
                 label_interpreter = value_arguments{ii};
             case 'filltransparency'
                 fill_transparency = value_arguments{ii};
+            case 'axeshandle'
+                axes_handle = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
     end
 
 end
+
+% Default background color
+background_color = 'w';
+
+% Check if empty
+if isempty(axes_handle)
+    % Figure and axes handles
+    fig = figure;
+    ax = fig.CurrentAxes;
+else
+    % Figure and axes handles
+    ax = axes_handle;
+    fig = axes_handle.Parent;
+end
+
+% Check for output arguments
+if nargout > 1
+    error('Error: Too many output arguments assigned.');
+end
+varargout{1} = fig;
+
+% Axes properties
+fig.Color = background_color;
+ax.Color = background_color;
+
+% Axis properties
+hold(ax, 'on');
+axis(ax, 'square');
+scaling_factor = 1.2;
+axis(ax, [-1, 1, -1, 1] * scaling_factor);
+
+% Axis properties
+ax.XTickLabel = [];
+ax.YTickLabel = [];
+ax.XColor = 'none';
+ax.YColor = 'none';
 
 % Error checking
 if rho_lower < 0 || rho_lower > 1
@@ -225,7 +237,7 @@ for ii = 1:num_pie
         end
 
         % Create patch object
-        patch(x_patch, y_patch, wedge_color(jj, :),...
+        patch(ax, x_patch, y_patch, wedge_color(jj, :),...
             'LineStyle', line_style,...
             'EdgeColor', edge_color,...
             'LineWidth', line_width,...
@@ -279,7 +291,7 @@ for ii = 1:num_pie
                 [horz_align, vert_align] = quadrant_position(theta_txt);
 
                 % Display pie labels
-                text(x_label, y_label, label_text{kk},...
+                text(ax, x_label, y_label, label_text{kk},...
                     'Color', label_fontcolor,...
                     'FontWeight', label_fontweight,...
                     'FontSize', label_fontsize,...
