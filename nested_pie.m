@@ -52,7 +52,7 @@ label_rotation = 0;
 label_offset = 0;
 label_interpreter = 'none';
 interval_res = 0.01;
-axes_handle = [];
+axes_handle = gobjects;
 
 % Number of optional arguments
 numvarargs = length(varargin);
@@ -122,13 +122,15 @@ end
 background_color = 'w';
 
 % Check if empty
-if isempty(axes_handle)
+if isempty(properties(axes_handle))
     % Figure and axes handles
     fig = figure;
-    ax = fig.CurrentAxes;
+    cla reset;
+    ax = gca;
 else
     % Figure and axes handles
     ax = axes_handle;
+    axes(ax);
     fig = axes_handle.Parent;
 end
 
