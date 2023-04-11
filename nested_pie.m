@@ -105,6 +105,8 @@ if numvarargs > 1
                 label_backgroundcolor = value_arguments{ii};
             case 'labelrotation'
                 label_rotation = value_arguments{ii};
+            case 'labeloffset'
+                label_offset = value_arguments{ii};
             case 'labelinterpreter'
                 label_interpreter = value_arguments{ii};
             case 'filltransparency'
@@ -141,7 +143,9 @@ end
 varargout{1} = fig;
 
 % Axes properties
-fig.Color = background_color;
+if isprop(fig, "Color")
+    fig.Color = background_color;
+end
 ax.Color = background_color;
 
 % Axis properties
