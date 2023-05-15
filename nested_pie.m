@@ -132,7 +132,7 @@ if isempty(properties(axes_handle))
 else
     % Figure and axes handles
     ax = axes_handle;
-    axes(ax);
+    %axes(ax);
     fig = axes_handle.Parent;
 end
 
@@ -183,12 +183,12 @@ for ii = 1:num_pie
     num_wedge = num_wedges(ii);
     wedge_color = wedge_colors{ii};
     bEssentiallyEqual = false;
-    
+
     % Compare taking into account floating-point number
     if abs(1 - sum(sub_pie)) <= tol
         bEssentiallyEqual = true;
     end
-    
+
     % Check if data does not sum to one
     if ~bEssentiallyEqual
         % Display warning
