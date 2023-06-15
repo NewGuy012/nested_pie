@@ -90,6 +90,9 @@ Create a nested pie chart with customizable text.
 - **FillTransparency**- Used to specify the fill transparency of the wedges.
                         [scalar value between (0, 1)]
 
+- **IgnorePercent**   - Used to ignore the labelling below a certain percent. Useful for small percentage to avoid clutter.
+                        [scalar value between (0, 1)]
+
 ## Examples:
 ### Example 1: Nested pie chart
 ```matlab
