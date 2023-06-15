@@ -53,6 +53,7 @@ label_offset = 0;
 label_interpreter = 'none';
 interval_res = 0.01;
 axes_handle = gobjects;
+ignore_percent = 0;
 
 % Number of optional arguments
 numvarargs = length(varargin);
@@ -113,6 +114,8 @@ if numvarargs > 1
                 fill_transparency = value_arguments{ii};
             case 'axeshandle'
                 axes_handle = value_arguments{ii};
+            case 'ignorepercent'
+                ignore_percent = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
@@ -132,7 +135,6 @@ if isempty(properties(axes_handle))
 else
     % Figure and axes handles
     ax = axes_handle;
-    %axes(ax);
     fig = axes_handle.Parent;
 end
 
@@ -183,12 +185,12 @@ for ii = 1:num_pie
     num_wedge = num_wedges(ii);
     wedge_color = wedge_colors{ii};
     bEssentiallyEqual = false;
-
+    
     % Compare taking into account floating-point number
     if abs(1 - sum(sub_pie)) <= tol
         bEssentiallyEqual = true;
     end
-
+    
     % Check if data does not sum to one
     if ~bEssentiallyEqual
         % Display warning
@@ -269,44 +271,51 @@ for ii = 1:num_pie
         for kk = 1:length(theta_diff)
             % Initialize
             theta_txt = theta_diff(kk);
+            sub_percent = sub_pie(kk)*100;
 
             % Check if display percent status
             if strcmp(percent_status{ii}, 'on')
-                % Format percentage text
-                precision_txt = sprintf('%i', percent_precision);
-                percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_pie(kk)*100);
+                % Check if non-trivial amount
+                if sub_percent > ignore_percent
+                    % Format percentage text
+                    precision_txt = sprintf('%i', percent_precision);
+                    percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_percent);
 
-                % Convert from polar to cartesian
-                [x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
+                    % Convert from polar to cartesian
+                    [x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
 
-                % Display percentage text
-                text(x_txt, y_txt, percent_txt,...
-                    'Color', percent_fontcolor,...
-                    'FontWeight', percent_fontweight,...
-                    'FontSize', percent_fontsize,...
-                    'EdgeColor', percent_edgecolor,...
-                    'BackgroundColor', percent_backgroundcolor,...
-                    'HorizontalAlignment', 'center');
+                    % Display percentage text
+                    text(x_txt, y_txt, percent_txt,...
+                        'Color', percent_fontcolor,...
+                        'FontWeight', percent_fontweight,...
+                        'FontSize', percent_fontsize,...
+                        'EdgeColor', percent_edgecolor,...
+                        'BackgroundColor', percent_backgroundcolor,...
+                        'HorizontalAlignment', 'center');
+                end
             end
 
             % Only for outermost
             if ii == num_pie
-                % Convert from polar to cartesian
-                [x_label, y_label] = pol2cart(theta_txt, rho_label+label_offset);
+                % Check if non-trivial amount
+                if sub_percent > ignore_percent
+                    % Convert from polar to cartesian
+                    [x_label, y_label] = pol2cart(theta_txt, rho_label+label_offset);
 
-                [horz_align, vert_align] = quadrant_position(theta_txt);
+                    [horz_align, vert_align] = quadrant_position(theta_txt);
 
-                % Display pie labels
-                text(ax, x_label, y_label, label_text{kk},...
-                    'Color', label_fontcolor,...
-                    'FontWeight', label_fontweight,...
-                    'FontSize', label_fontsize,...
-                    'EdgeColor', label_edgecolor,...
-                    'BackgroundColor', label_backgroundcolor,...
-                    'Rotation', label_rotation,...
-                    'HorizontalAlignment', horz_align,...
-                    'VerticalAlignment', vert_align,...
-                    'Interpreter', label_interpreter);
+                    % Display pie labels
+                    text(ax, x_label, y_label, label_text{kk},...
+                        'Color', label_fontcolor,...
+                        'FontWeight', label_fontweight,...
+                        'FontSize', label_fontsize,...
+                        'EdgeColor', label_edgecolor,...
+                        'BackgroundColor', label_backgroundcolor,...
+                        'Rotation', label_rotation,...
+                        'HorizontalAlignment', horz_align,...
+                        'VerticalAlignment', vert_align,...
+                        'Interpreter', label_interpreter);
+                end
             end
         end
     end
