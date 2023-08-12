@@ -54,6 +54,7 @@ label_interpreter = 'none';
 interval_res = 0.01;
 axes_handle = gobjects;
 ignore_percent = 0;
+background_color = 'w';
 
 % Number of optional arguments
 numvarargs = length(varargin);
@@ -116,15 +117,14 @@ if numvarargs > 1
                 axes_handle = value_arguments{ii};
             case 'ignorepercent'
                 ignore_percent = value_arguments{ii};
+            case 'backgroundcolor'
+                background_color = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
     end
 
 end
-
-% Default background color
-background_color = 'w';
 
 % Check if empty
 if isempty(properties(axes_handle))
