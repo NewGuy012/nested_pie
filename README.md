@@ -263,7 +263,7 @@ lg =legend(legend_str, 'Location', 'eastoutside');
 lg.Title.String = 'Inner Pie';
 ```
 <p align="center">
-  <img src="screenshot/example5.PNG">
+  <img src="screenshot/example5.png">
 </p>
 
 ## Author:
