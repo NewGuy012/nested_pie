@@ -93,6 +93,9 @@ Create a nested pie chart with customizable text.
 - **IgnorePercent**   - Used to ignore the labelling below a certain percent. Useful for small percentage to avoid clutter.
                         [scalar value between (0, 1)]
 
+- **LegendOrder**     - Used to change the order in which pie layer is displayed first in the legend.
+                        [inner to outer (default) | scalar values between(1, number of layers)]
+
 ## Examples:
 ### Example 1: Nested pie chart
 ```matlab
@@ -113,8 +116,8 @@ title('Nested Pie Chart');
 % Legend properties
 legend_str = cell(length(inner_pie), 1);
 for ii = 1:length(legend_str)
-    inner_value = inner_pie(ii);
-    legend_str{ii} = sprintf('Inner Pie #%i: %.1f%%', ii, inner_value*100);
+    legend_value = inner_pie(ii);
+    legend_str{ii} = sprintf('Inner Pie #%i: %.1f%%', ii, legend_value*100);
 end
 lg =legend(legend_str, 'Location', 'eastoutside');
 lg.Title.String = 'Inner Pie';
@@ -198,10 +201,76 @@ title('Nested Pie Chart');
   <img src="screenshot/example4.PNG">
 </p>
 
+### Example 5: Adjust order in which pie layer is displayed in legend
+```matlab
+% Initialize data points
+inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
+middle_pie = [0.2, 0.05, 0.1, 0.1, 0.05, 0.1, 0.2, 0.2];
+outer_pie = [0.25, 0.25, 0.5];
+outer_label = {...
+    'Outer Pie #1',...
+    'Outer Pie #2',...
+    'Outer Pie #3'};
+
+% Custom colors
+inner_colors = [...
+    0 0.4470 0.7410;...
+    0 0.4470 0.7410;...
+    0 0.4470 0.7410;...
+    0 0.4470 0.7410;...
+    0 0.4470 0.7410;...
+    0 0.4470 0.7410;];
+middle_colors = [...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980;...
+    0.8500 0.3250 0.0980];
+outer_colors = [...
+    0.9290 0.6940 0.1250;...
+    0.9290 0.6940 0.1250;...
+    0.9290 0.6940 0.1250];
+wedge_colors = {...
+    inner_colors,...
+    middle_colors,...
+    outer_colors};
+
+C = {...
+    inner_pie,... % Inner to outer layer
+    middle_pie,...
+    outer_pie};
+
+% Spider plot
+h = nested_pie(C,...
+    'PercentStatus', {'off', 'off', 'off'},...
+    'WedgeColors', wedge_colors,...
+    'LabelText', outer_label,...
+    'LegendOrder', [2, 1, 3]);
+
+% Title
+title('Nested Pie Chart');
+
+% Legend properties
+legend_str = cell(length(middle_pie), 1);
+for ii = 1:length(legend_str)
+    legend_value = middle_pie(ii);
+    legend_str{ii} = sprintf('Middle Pie #%i: %04.1f%%', ii, legend_value*100);
+end
+lg =legend(legend_str, 'Location', 'eastoutside');
+lg.Title.String = 'Inner Pie';
+```
+<p align="center">
+  <img src="screenshot/example5.PNG">
+</p>
+
 ## Author:
 Moses Yoo, (juyoung.m.yoo at gmail dot com)
 
 ## Special Thanks:
 Special thanks to the following people for their feature recommendations and bug finds.
+- Leila
 
 [![View nested_pie on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/122167-nested_pie)

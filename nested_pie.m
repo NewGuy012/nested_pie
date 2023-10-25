@@ -54,6 +54,7 @@ label_interpreter = 'none';
 interval_res = 0.01;
 axes_handle = gobjects;
 ignore_percent = 0;
+legend_order = [];
 
 % Number of optional arguments
 numvarargs = length(varargin);
@@ -116,6 +117,8 @@ if numvarargs > 1
                 axes_handle = value_arguments{ii};
             case 'ignorepercent'
                 ignore_percent = value_arguments{ii};
+            case 'legendorder'
+                legend_order = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
@@ -245,11 +248,12 @@ for ii = 1:num_pie
         end
 
         % Create patch object
-        patch(ax, x_patch, y_patch, wedge_color(jj, :),...
+        p = patch(ax, x_patch, y_patch, wedge_color(jj, :),...
             'LineStyle', line_style,...
             'EdgeColor', edge_color,...
             'LineWidth', line_width,...
             'FaceAlpha', fill_transparency);
+        p.Tag = sprintf('Layer %i, Wedge %i', ii, jj);
     end
 
     % Find midpoint of theta and rho
@@ -319,6 +323,28 @@ for ii = 1:num_pie
             end
         end
     end
+end
+
+if ~isempty(legend_order) &&...
+        isnumeric(legend_order) &&...
+        length(legend_order) == num_pie &&...
+        length(unique(legend_order)) == num_pie &&...
+        max(legend_order) == num_pie
+
+    f = fig;
+    h = f.Children;
+    a = findobj(h, 'Type', 'axes');
+
+
+    for ii = length(legend_order):-1:1
+        order = legend_order(ii);
+        tag_str = compose("Layer %i", order);
+        p = a.Children;
+        h = findobj(p, '-regexp', 'Tag', tag_str);
+
+        uistack(h, "bottom");
+    end
+
 end
 
     function [horz_align, vert_align] = quadrant_position(theta_point)
