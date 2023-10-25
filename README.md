@@ -260,7 +260,7 @@ for ii = 1:length(legend_str)
     legend_str{ii} = sprintf('Middle Pie #%i: %04.1f%%', ii, legend_value*100);
 end
 lg =legend(legend_str, 'Location', 'eastoutside');
-lg.Title.String = 'Inner Pie';
+lg.Title.String = 'Middle Pie';
 ```
 <p align="center">
   <img src="screenshot/example5.png">
