@@ -354,7 +354,7 @@ if ~isempty(legend_order) &&...
         % Stack from bottom
         uistack(h, "bottom");
     end
-else
+elseif ~isempty(legend_order)
     error('Error: Please enter in valid number of pie layers to rearrange legend order.');
 end
 
