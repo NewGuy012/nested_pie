@@ -11,32 +11,32 @@ function fig = nested_pie(C, options)
 %   detailed documentation and examples.
 arguments
 	C
-	options.rholower = 0.2;
-	options.edgecolor = 'k';
-	options.linewidth = 2;
-	options.linestyle = '-';
-	options.wedgecolors
-	options.percentstatus
-	options.percentprecision = 1;
-	options.percentfontcolor = 'w';
-	options.percentfontsize = 10;
-	options.percentfontweight = 'bold';
-	options.percentedgecolor = 'none';
-	options.percentbackgroundcolor = 'none';
-	options.labeltext string
-	options.labelfontsize = 10;
-	options.labelfontcolor = 'k';
-	options.labelfontweight = 'bold';
-	options.labeledgecolor = 'none';
-	options.labelbackgroundcolor = 'none';
-	options.labelrotation = 0;
-	options.labeloffset = 0;
-	options.labelinterpreter = 'none';
-	options.filltransparency = 1;
-	options.axeshandle
-	options.ignorepercent = 0;
-	options.backgroundcolor = 'w';
-	options.legendorder = [];
+	options.RhoLower = 0.2;
+	options.EdgeColor = 'k';
+	options.LineWidth = 2;
+	options.LineStyle = '-';
+	options.WedgeColors
+	options.PercentStatus
+	options.PercentPrecision = 1;
+	options.PercentFontColor = 'w';
+	options.PercentFontSize = 10;
+	options.PercentFontWeight = 'bold';
+	options.PercentEdgeColor = 'none';
+	options.PercentBackgroundColor = 'none';
+	options.LabelText string
+	options.LabelFontSize = 10;
+	options.LabelFontColor = 'k';
+	options.LabelFontWeight = 'bold';
+	options.LabelEdgeColor = 'none';
+	options.LabelBackgroundColor = 'none';
+	options.LabelRotation = 0;
+	options.LabelOffset = 0;
+	options.LabelInterpreter = 'none';
+	options.FillTransparency = 1;
+	options.AxesHandle
+	options.IgnorePercent = 0;
+	options.BackgroundColor = 'w';
+	options.LegendOrder = [];
 end
 
 % Pie properties
@@ -47,36 +47,41 @@ num_outmost = numel(C{end});
 num_wedges = cellfun(@numel, C);
 
 % Default arguments
-HasFields=isfield(options,["wedgecolors","percentstatus","labeltext","axeshandle"]);
-if HasFields(1)
-	wedge_colors=options.wedgecolors;
-else
-	wedge_colors=repmat({lines(max(num_wedges(:)))},num_pie,1);
-end
-if HasFields(2)
-	percent_status=options.percentstatus;
-else
-	percent_status = repmat(matlab.lang.OnOffSwitchState.on,num_pie,1);
-end
-if HasFields(3)
-	label_text=options.labeltext;
-else
-	label_text=compose("Label %u",1:num_outmost);
-end
-if HasFields(4)
-	ax=options.axeshandle;
-	fig=ax.Parent;
-else
-	fig=figure;
-	ax=gca;
-end
 interval_res = 0.01;
+
+% Check if default or user specified
+if isfield(options, "WedgeColors")
+	wedge_colors = options.WedgeColors;
+else
+	wedge_colors = repmat({lines(max(num_wedges(:)))}, num_pie,1);
+end
+
+if isfield(options, "PercentStatus")
+	percent_status = options.PercentStatus;
+else
+	percent_status = repmat(matlab.lang.OnOffSwitchState.on, num_pie, 1);
+end
+
+if isfield(options, "LabelText")
+	label_text = options.LabelText;
+else
+	label_text = compose("Label %i", 1:num_outmost);
+end
+
+if isfield(options, "AxesHandle")
+	ax = options.AxesHandle;
+	fig = ax.Parent;
+else
+	fig = figure;
+	ax = gca;
+end
+
 
 % Axes properties
 if isprop(fig, "Color")
-    fig.Color = options.backgroundcolor;
+    fig.Color = options.BackgroundColor;
 end
-ax.Color = options.backgroundcolor;
+ax.Color = options.BackgroundColor;
 
 % Axis properties
 hold(ax, 'on');
@@ -90,7 +95,7 @@ ax.XColor = 'none';
 ax.YColor = 'none';
 
 % Error checking
-if options.rholower < 0 || options.rholower > 1
+if options.RhoLower < 0 || options.RhoLower > 1
     error('Error: The starting radius must be a value between [0, 1].');
 end
 
@@ -101,9 +106,9 @@ end
 
 % Initialize rho
 rho_upper = 1;
-rho_range = rho_upper - options.rholower;
+rho_range = rho_upper - options.RhoLower;
 rho_interval = rho_range/num_pie;
-rho = options.rholower:rho_interval:rho_upper;
+rho = options.RhoLower:rho_interval:rho_upper;
 tol = eps(10);
 
 % Iterate through number of nested pies
@@ -174,10 +179,10 @@ for ii = 1:num_pie
 
         % Create patch object
         p = patch(ax, x_patch, y_patch, wedge_color(jj, :),...
-            'LineStyle', options.linestyle,...
-            'EdgeColor', options.edgecolor,...
-            'LineWidth', options.linewidth,...
-            'FaceAlpha', options.filltransparency);
+            'LineStyle', options.LineStyle,...
+            'EdgeColor', options.EdgeColor,...
+            'LineWidth', options.LineWidth,...
+            'FaceAlpha', options.FillTransparency);
         p.Tag = sprintf('Layer %i, Wedge %i', ii, jj);
     end
 
@@ -205,9 +210,9 @@ for ii = 1:num_pie
             % Check if display percent status
 			if percent_status(ii)==matlab.lang.OnOffSwitchState.on
 				% Check if non-trivial amount
-				if sub_percent > options.ignorepercent
+				if sub_percent > options.IgnorePercent
 					% Format percentage text
-					precision_txt = sprintf('%i', options.percentprecision);
+					precision_txt = sprintf('%i', options.PercentPrecision);
 					percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_percent);
 
 					% Convert from polar to cartesian
@@ -215,11 +220,11 @@ for ii = 1:num_pie
 
 					% Display percentage text
 					text(x_txt, y_txt, percent_txt,...
-						'Color', options.percentfontcolor,...
-						'FontWeight', options.percentfontweight,...
-						'FontSize', options.percentfontsize,...
-						'EdgeColor', options.percentedgecolor,...
-						'BackgroundColor', options.percentbackgroundcolor,...
+						'Color', options.PercentFontColor,...
+						'FontWeight', options.PercentFontWeight,...
+						'FontSize', options.PercentFontSize,...
+						'EdgeColor', options.PercentEdgeColor,...
+						'BackgroundColor', options.PercentBackgroundColor,...
 						'HorizontalAlignment', 'center');
 				end
 			end
@@ -229,31 +234,31 @@ end
 
 % Only for outermost
 % Check if non-trivial amount
-if sub_percent > options.ignorepercent&&HasLabels
+if sub_percent > options.IgnorePercent&&HasLabels
 	% Convert from polar to cartesian
-	[x_label, y_label] = pol2cart(theta_txt, rho_label+options.labeloffset);
+	[x_label, y_label] = pol2cart(theta_txt, rho_label+options.LabelOffset);
 
 	[horz_align, vert_align] = quadrant_position(theta_txt);
 
 	% Display pie labels
 	text(ax, x_label, y_label, label_text(kk),...
-		'Color', options.labelfontcolor,...
-		'FontWeight', options.labelfontweight,...
-		'FontSize', options.labelfontsize,...
-		'EdgeColor', options.labeledgecolor,...
-		'BackgroundColor', options.labelbackgroundcolor,...
-		'Rotation', options.labelrotation,...
+		'Color', options.LabelFontColor,...
+		'FontWeight', options.LabelFontWeight,...
+		'FontSize', options.LabelFontSize,...
+		'EdgeColor', options.LabelEdgeColor,...
+		'BackgroundColor', options.LabelBackgroundColor,...
+		'Rotation', options.LabelRotation,...
 		'HorizontalAlignment', horz_align,...
 		'VerticalAlignment', vert_align,...
-		'Interpreter', options.labelinterpreter);
+		'Interpreter', options.LabelInterpreter);
 end
 
 % Check if legend order is valid
-if ~isempty(options.legendorder) &&...
-        isnumeric(options.legendorder) &&...
-        length(options.legendorder) == num_pie &&...
-        length(unique(options.legendorder)) == num_pie &&...
-        max(options.legendorder) == num_pie
+if ~isempty(options.LegendOrder) &&...
+        isnumeric(options.LegendOrder) &&...
+        length(options.LegendOrder) == num_pie &&...
+        length(unique(options.LegendOrder)) == num_pie &&...
+        max(options.LegendOrder) == num_pie
 
     % Get axes handle
     f = fig;
@@ -261,9 +266,9 @@ if ~isempty(options.legendorder) &&...
     a = findobj(h, 'Type', 'axes');
 
     % Iterate in backwards order
-    for ii = length(options.legendorder):-1:1
+    for ii = length(options.LegendOrder):-1:1
         % Initialize
-        order = options.legendorder(ii);
+        order = options.LegendOrder(ii);
 
         % Compose layer number
         tag_str = compose("Layer %i", order);
@@ -277,7 +282,7 @@ if ~isempty(options.legendorder) &&...
         % Stack from bottom
         uistack(h, "bottom");
     end
-elseif ~isempty(options.legendorder)
+elseif ~isempty(options.LegendOrder)
     error('Error: Please enter in valid number of pie layers to rearrange legend order.');
 end
 
