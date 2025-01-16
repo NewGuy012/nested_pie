@@ -10,33 +10,38 @@ function fig = nested_pie(C, options)
 %   Please refer to the MathWorks File Exchange or GitHub page for the
 %   detailed documentation and examples.
 arguments
-	C
-	options.RhoLower = 0.2;
-	options.EdgeColor = 'k';
-	options.LineWidth = 2;
-	options.LineStyle = '-';
-	options.WedgeColors
-	options.PercentStatus
-	options.PercentPrecision = 1;
-	options.PercentFontColor = 'w';
-	options.PercentFontSize = 10;
-	options.PercentFontWeight = 'bold';
-	options.PercentEdgeColor = 'none';
-	options.PercentBackgroundColor = 'none';
-	options.LabelText string
-	options.LabelFontSize = 10;
-	options.LabelFontColor = 'k';
-	options.LabelFontWeight = 'bold';
-	options.LabelEdgeColor = 'none';
-	options.LabelBackgroundColor = 'none';
-	options.LabelRotation = 0;
-	options.LabelOffset = 0;
-	options.LabelInterpreter = 'none';
-	options.FillTransparency = 1;
-	options.AxesHandle
-	options.IgnorePercent = 0;
-	options.BackgroundColor = 'w';
-	options.LegendOrder = [];
+    C
+    options.RhoLower = 0.2;
+    options.ThetaInitial = 0;
+    options.ThetaDirection = 'counterclockwise';
+    options.EdgeColor = 'k';
+    options.LineWidth = 2;
+    options.LineStyle = '-';
+    options.WedgeColors
+    options.PercentStatus
+    options.PercentPrecision = 1;
+    options.PercentFontColor = 'w';
+    options.PercentFontSize = 10;
+    options.PercentFontWeight = 'bold';
+    options.PercentEdgeColor = 'none';
+    options.PercentBackgroundColor = 'none';
+    options.LayerText = []
+    options.LabelText string
+    options.LabelToggle = 'on';
+    options.LabelFontSize = 10;
+    options.LabelFontColor = 'k';
+    options.LabelFontWeight = 'bold';
+    options.LabelEdgeColor = 'none';
+    options.LabelBackgroundColor = 'none';
+    options.LabelRotation = 0;
+    options.LabelOffset = 0;
+    options.LabelInterpreter = 'none';
+    options.FillTransparency = 1;
+    options.AxesHandle
+    options.IgnorePercent = 0;
+    options.BackgroundColor = 'w';
+    options.LegendOrder = [];
+    options.AxesZoom = 1.2;
 end
 
 % Pie properties
@@ -51,31 +56,38 @@ interval_res = 0.01;
 
 % Check if default or user specified
 if isfield(options, "WedgeColors")
-	wedge_colors = options.WedgeColors;
+    wedge_colors = options.WedgeColors;
 else
-	wedge_colors = repmat({lines(max(num_wedges(:)))}, num_pie,1);
+    wedge_colors = repmat({lines(max(num_wedges(:)))}, num_pie,1);
 end
 
 if isfield(options, "PercentStatus")
-	percent_status = options.PercentStatus;
+    percent_status = options.PercentStatus;
 else
-	percent_status = repmat(matlab.lang.OnOffSwitchState.on, num_pie, 1);
+    percent_status = repmat(matlab.lang.OnOffSwitchState.on, num_pie, 1);
+end
+
+if isfield(options, "LayerText")
+    layer_txt = options.LayerText;
+else
+    layer_txt = [];
 end
 
 if isfield(options, "LabelText")
-	label_text = options.LabelText;
+    label_text = options.LabelText;
+elseif options.LabelToggle == "on"
+    label_text = compose("Label %i", 1:num_outmost);
 else
-	label_text = compose("Label %i", 1:num_outmost);
+    label_text = [];
 end
 
 if isfield(options, "AxesHandle")
-	ax = options.AxesHandle;
-	fig = ax.Parent;
+    ax = options.AxesHandle;
+    fig = ax.Parent;
 else
-	fig = figure;
-	ax = gca;
+    fig = figure;
+    ax = gca;
 end
-
 
 % Axes properties
 if isprop(fig, "Color")
@@ -86,7 +98,7 @@ ax.Color = options.BackgroundColor;
 % Axis properties
 hold(ax, 'on');
 axis(ax, 'square');
-axis(ax, [-1, 1, -1, 1] * 1.2);
+axis(ax, [-1, 1, -1, 1] * options.AxesZoom);
 
 % Axis properties
 ax.XTickLabel = [];
@@ -95,12 +107,13 @@ ax.XColor = 'none';
 ax.YColor = 'none';
 
 % Error checking
-if options.RhoLower < 0 || options.RhoLower > 1
+if options.RhoLower < 0 ||...
+        options.RhoLower > 1
     error('Error: The starting radius must be a value between [0, 1].');
 end
 
-HasLabels=~isempty(label_text);
-if HasLabels&&numel(label_text) ~= num_outmost
+if ~isempty(label_text) &&...
+        numel(label_text) ~= num_outmost
     error('Error: The label text must equal the length of the wedges in the outer most layer.');
 end
 
@@ -137,6 +150,13 @@ for ii = 1:num_pie
     theta = 2 * pi * sub_pie;
     theta = cumsum(theta);
     theta = [0, theta]; %#ok<*AGROW>
+    theta = theta + options.ThetaInitial;
+
+    % Check for reverse direction
+    if options.ThetaDirection == "clockwise"
+        theta = theta * -1;
+        theta = theta + 2*pi;
+    end
 
     % Iterate through number of wedges
     for jj = 1:num_wedge
@@ -207,50 +227,66 @@ for ii = 1:num_pie
             theta_txt = theta_diff(kk);
             sub_percent = sub_pie(kk)*100;
 
-            % Check if display percent status
-			if percent_status(ii)==matlab.lang.OnOffSwitchState.on
-				% Check if non-trivial amount
-				if sub_percent > options.IgnorePercent
-					% Format percentage text
-					precision_txt = sprintf('%i', options.PercentPrecision);
-					percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_percent);
+            % Check if non-trivial amount
+            if sub_percent > options.IgnorePercent
+                % Convert from polar to cartesian
+                [x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
 
-					% Convert from polar to cartesian
-					[x_txt, y_txt] = pol2cart(theta_txt, rho_txt);
+                % Check if display percent status
+                if percent_status(ii) == "on"
+                    % Format percentage text
+                    precision_txt = sprintf('%i', options.PercentPrecision);
+                    percent_txt = sprintf(['%.', precision_txt, 'f%%'], sub_percent);
 
-					% Display percentage text
-					text(x_txt, y_txt, percent_txt,...
-						'Color', options.PercentFontColor,...
-						'FontWeight', options.PercentFontWeight,...
-						'FontSize', options.PercentFontSize,...
-						'EdgeColor', options.PercentEdgeColor,...
-						'BackgroundColor', options.PercentBackgroundColor,...
-						'HorizontalAlignment', 'center');
-				end
-			end
+                    % Display percentage text
+                    text(x_txt, y_txt, percent_txt,...
+                        'Color', options.PercentFontColor,...
+                        'FontWeight', options.PercentFontWeight,...
+                        'FontSize', options.PercentFontSize,...
+                        'EdgeColor', options.PercentEdgeColor,...
+                        'BackgroundColor', options.PercentBackgroundColor,...
+                        'HorizontalAlignment', 'center');
+
+                % Check if not empty
+                elseif ~isempty(layer_txt)
+                    % Current text
+                    current_layer = layer_txt{ii};
+                    current_txt = current_layer{kk};
+
+                    % Display percentage text
+                    text(x_txt, y_txt, current_txt,...
+                        'Color', options.PercentFontColor,...
+                        'FontWeight', options.PercentFontWeight,...
+                        'FontSize', options.PercentFontSize,...
+                        'EdgeColor', options.PercentEdgeColor,...
+                        'BackgroundColor', options.PercentBackgroundColor,...
+                        'HorizontalAlignment', 'center');
+                end
+
+                % Check if outermost pie layer
+                if ii == num_pie &&...
+                        ~isempty(label_text)
+                    % Convert from polar to cartesian
+                    [x_label, y_label] = pol2cart(theta_txt,...
+                        rho_label + options.LabelOffset);
+
+                    [horz_align, vert_align] = quadrant_position(theta_txt);
+
+                    % Display pie labels
+                    text(ax, x_label, y_label, label_text(kk),...
+                        'Color', options.LabelFontColor,...
+                        'FontWeight', options.LabelFontWeight,...
+                        'FontSize', options.LabelFontSize,...
+                        'EdgeColor', options.LabelEdgeColor,...
+                        'BackgroundColor', options.LabelBackgroundColor,...
+                        'Rotation', options.LabelRotation,...
+                        'HorizontalAlignment', horz_align,...
+                        'VerticalAlignment', vert_align,...
+                        'Interpreter', options.LabelInterpreter);
+                end
+            end
         end
     end
-end
-
-% Only for outermost
-% Check if non-trivial amount
-if sub_percent > options.IgnorePercent&&HasLabels
-	% Convert from polar to cartesian
-	[x_label, y_label] = pol2cart(theta_txt, rho_label+options.LabelOffset);
-
-	[horz_align, vert_align] = quadrant_position(theta_txt);
-
-	% Display pie labels
-	text(ax, x_label, y_label, label_text(kk),...
-		'Color', options.LabelFontColor,...
-		'FontWeight', options.LabelFontWeight,...
-		'FontSize', options.LabelFontSize,...
-		'EdgeColor', options.LabelEdgeColor,...
-		'BackgroundColor', options.LabelBackgroundColor,...
-		'Rotation', options.LabelRotation,...
-		'HorizontalAlignment', horz_align,...
-		'VerticalAlignment', vert_align,...
-		'Interpreter', options.LabelInterpreter);
 end
 
 % Check if legend order is valid
@@ -282,6 +318,7 @@ if ~isempty(options.LegendOrder) &&...
         % Stack from bottom
         uistack(h, "bottom");
     end
+
 elseif ~isempty(options.LegendOrder)
     error('Error: Please enter in valid number of pie layers to rearrange legend order.');
 end
