@@ -158,7 +158,7 @@ nested_pie(C,...
     'LayerText', layer_txt);
 ```
 <p align="center">
-  <img src="screenshot/example1a.PNG">
+  <img src="screenshot/example1a.png">
 </p>
 
 ### Example 2: Nested pie chart with custom colors for each wedge
