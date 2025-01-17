@@ -27,6 +27,12 @@ Create a nested pie chart with customizable text.
 - **RhoLower**       -  Used to specify the starting radius of the inner most nested pie chart.
                         [0.2 (default) | scalar value between (0, 1)]
 
+- **ThetaInitial**   -  Used to specify the starting theta position of the layers.
+                        [0 (default) | scalar value between (0, 2*pi)]
+
+- **ThetaDirection** -  Used to specify the direction of wedges.
+                        ['counterclockwise' (default) | 'clockwise']
+
 - **EdgeColor**       - Used to specify the edge color of the wedges.
                         [black (default) | RGB triplet | hexadecimal color code]
 
@@ -59,6 +65,9 @@ Create a nested pie chart with customizable text.
 
 - **PercentBackgroundColor**- Used to specify the percentage text box background color.
                         [white (default) | RGB triplet | hexadecimal color code]
+
+- **LayerText**       - Used to specify the text label of each individual wedges.
+                        [none (default) | cell array of char that match in size with wedges]
 
 - **LabelText**       - Used to specify the label of the outer most layer.
                         [default text | cell array of char]
@@ -106,7 +115,7 @@ C = {...
     inner_pie,... % Inner to outer layer
     outer_pie};
 
-% Spider plot
+% Nested pie chart
 nested_pie(C,...
     'PercentStatus', {'off', 'on'});
 
@@ -124,6 +133,32 @@ lg.Title.String = 'Inner Pie';
 ```
 <p align="center">
   <img src="screenshot/example1.PNG">
+</p>
+
+### Example 1a: Nested pie chart with each wedge labelled
+```matlab
+% Initialize data points
+inner_pie = [0.3, 0.3, 0.3, 0.1];
+outer_pie = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1];
+
+C = {...
+    inner_pie,... % Inner to outer layer
+    outer_pie};
+
+% Using text instead of percentage
+layer_txt = {{"Industry1","Industry2","Industry3","Industry4"},...
+    {"Scenario1","Scenario2","Scenario3","Scenario4","Scenario5","Scenario6","Scenario7","Scenario8","Scenario9","Scenario10"}};
+
+% Nested pie chart
+nested_pie(C,...
+    'LabelToggle', 'off',...
+    'ThetaInitial', 2.1*pi,...
+    'ThetaDirection', 'clockwise',...
+    'PercentStatus', {'off', 'off'},...
+    'LayerText', layer_txt);
+```
+<p align="center">
+  <img src="screenshot/example1a.PNG">
 </p>
 
 ### Example 2: Nested pie chart with custom colors for each wedge
@@ -151,7 +186,7 @@ wedge_colors = {...
     inner_colors,...
     outer_colors};
 
-% Spider plot
+% Nested pie chart
 nested_pie(C,...
     'WedgeColors', wedge_colors);
 
@@ -168,7 +203,7 @@ title('Nested Pie Chart');
 inner_pie = [0.1, 0.15, 0.2, 0.05, 0.3, 0.2];
 C = {inner_pie};
 
-% Spider plot
+% Nested pie chart
 nested_pie(C,...
     'RhoLower', 0.7);
 
@@ -190,7 +225,7 @@ C = {...
     middle_pie,...
     outer_pie};
 
-% Spider plot
+% Nested pie chart
 nested_pie(C,...
     'PercentStatus', {'off', 'off', 'off'});
 
@@ -243,7 +278,7 @@ C = {...
     middle_pie,...
     outer_pie};
 
-% Spider plot
+% Nested pie chart
 h = nested_pie(C,...
     'PercentStatus', {'off', 'off', 'off'},...
     'WedgeColors', wedge_colors,...
